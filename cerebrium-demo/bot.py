@@ -45,7 +45,7 @@ async def main(websocket_client, stream_sid):
     stt = DeepgramSTTService(
         api_key=os.getenv("DEEPGRAM_API_KEY"),
         live_options=LiveOptions(
-            model="nova-3-general",
+            model="nova-2-general",
             language="multi"
         )
     )
@@ -98,7 +98,7 @@ You are a friendly language learning conversation partner that helps english spe
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):
         # Kick off the conversation.
-        messages.append({"role": "system", "content": "Please introduce yourself to the user and ask what language do they want to practice"})
+        messages.append({"role": "system", "content": "Please introduce yourself in english to the user and ask what language do they want to practice"})
         await task.queue_frames([LLMMessagesFrame(messages)])
 
     @transport.event_handler("on_client_disconnected")
