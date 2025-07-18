@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <!--Update with your project ID below-->
+    <Stream url="wss://api.aws.us-east-1.cerebrium.ai/v4/p-48285f5e/cerebrium-demo/ws"></Stream>
+  </Connect>
+  <Pause length="40"/>
+</Response>

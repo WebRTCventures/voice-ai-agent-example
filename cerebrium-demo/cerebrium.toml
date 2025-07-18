@@ -1,0 +1,39 @@
+[cerebrium.deployment]
+name = "cerebrium-demo"
+python_version = "3.12"
+docker_base_image_url = "debian:bookworm-slim"
+disable_auth = true
+include = ['./*', 'main.py', 'cerebrium.toml']
+exclude = ['.*']
+
+[cerebrium.hardware]
+cpu = 2.0
+memory = 2.0
+compute = "CPU"
+provider = "aws"
+region = "us-east-1"
+
+[cerebrium.scaling]
+min_replicas = 0
+max_replicas = 2
+cooldown = 30
+replica_concurrency = 1
+scaling_metric = "concurrency_utilization"
+
+[cerebrium.dependencies.pip]
+torch = ">=2.0.0"
+"pipecat-ai[silero, daily, openai, deepgram, elevenlabs, twilio]" = "0.0.47"
+aiohttp = ">=3.9.4"
+torchaudio = ">=2.3.0"
+channels = ">=4.0.0"
+requests = "==2.32.2"
+twilio = "latest"
+fastapi = "latest"
+uvicorn = "latest"
+python-dotenv = "latest"
+loguru = "latest"
+
+[cerebrium.runtime.custom]
+port = 8765
+entrypoint = ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8765"]
+healthcheck_endpoint = "/health"
