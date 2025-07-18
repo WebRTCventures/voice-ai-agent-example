@@ -1,0 +1,49 @@
+# Infrastructure Deployment
+
+This directory contains OpenTofu configuration to deploy the minimal AWS infrastructure for the voice AI agent.
+
+## Prerequisites
+- OpenTofu installed
+- AWS CLI configured with appropriate permissions
+
+## Quick Start
+
+1. **Copy and configure variables**:
+   ```bash
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your actual API keys
+   ```
+
+2. **Deploy infrastructure**:
+   ```bash
+   ./deploy-infra.sh
+   ```
+
+3. **Build and deploy application**:
+   ```bash
+   cd ..
+   ./deploy.sh
+   ```
+
+## Task Definition Management
+Task definitions are managed outside of OpenTofu:
+- `../create-task-definition.sh` - Creates/updates task definition
+- `../deploy.sh` - Full deployment pipeline
+
+## What's Created
+- VPC with 2 public subnets
+- Internet Gateway and routing
+- Security group (allows port 8000)
+- ECS Fargate cluster
+- ECR repository
+- CloudWatch log group
+- AWS Secrets Manager for API keys
+- IAM execution role with Secrets Manager access
+- ECS service (starts with placeholder, updated during deployment)
+
+**Note**: Task definitions are managed separately via scripts.
+
+## Clean Up
+```bash
+tofu destroy
+```
