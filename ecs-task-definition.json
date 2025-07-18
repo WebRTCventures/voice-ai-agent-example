@@ -1,0 +1,51 @@
+{
+  "family": "voice-ai-agent",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "<execution-role-arn>",
+  "containerDefinitions": [
+    {
+      "name": "voice-ai-agent",
+      "image": "<ecr-url>:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "ELEVENLABS_API_KEY",
+          "valueFrom": "${SECRETS_ARN}:ELEVENLABS_API_KEY::"
+        },
+        {
+          "name": "DEEPGRAM_API_KEY",
+          "valueFrom": "${SECRETS_ARN}:DEEPGRAM_API_KEY::"
+        },
+        {
+          "name": "OPENAI_API_KEY",
+          "valueFrom": "${SECRETS_ARN}:OPENAI_API_KEY::"
+        },
+        {
+          "name": "TWILIO_ACCOUNT_SID",
+          "valueFrom": "${SECRETS_ARN}:TWILIO_ACCOUNT_SID::"
+        },
+        {
+          "name": "TWILIO_AUTH_TOKEN",
+          "valueFrom": "${SECRETS_ARN}:TWILIO_AUTH_TOKEN::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/voice-ai-agent",
+          "awslogs-region": "<region>",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "essential": true
+    }
+  ]
+}

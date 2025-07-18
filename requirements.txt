@@ -1,0 +1,11 @@
+torch>=2.0.0
+pipecat-ai[silero,daily,openai,deepgram,elevenlabs,twilio]==0.0.47
+aiohttp>=3.9.4
+torchaudio>=2.3.0
+channels>=4.0.0
+requests==2.32.2
+twilio
+fastapi
+uvicorn
+python-dotenv
+loguru

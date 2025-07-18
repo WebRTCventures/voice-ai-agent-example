@@ -26,9 +26,8 @@ This directory contains OpenTofu configuration to deploy the minimal AWS infrast
    ```
 
 ## Task Definition Management
-Task definitions are managed outside of OpenTofu:
-- `../create-task-definition.sh` - Creates/updates task definition
-- `../deploy.sh` - Full deployment pipeline
+Task definitions are managed during deployment:
+- `../deploy.sh` - Full deployment pipeline (includes task definition updates)
 
 ## What's Created
 - VPC with 2 public subnets

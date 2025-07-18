@@ -1,1 +1,10 @@
 .env
+
+# OpenTofu/Terraform
+infrastructure/.terraform/
+infrastructure/.terraform.lock.hcl
+infrastructure/terraform.tfvars
+infrastructure/terraform.tfstate*
+
+# Generated files
+ecs-task-definition-updated.json

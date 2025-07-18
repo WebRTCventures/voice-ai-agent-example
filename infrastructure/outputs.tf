@@ -37,3 +37,8 @@ output "ecs_service_name" {
   description = "ECS Service name"
   value       = aws_ecs_service.app.name
 }
+
+output "aws_region" {
+  description = "AWS Region"
+  value       = var.aws_region
+}
