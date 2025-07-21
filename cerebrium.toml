@@ -3,8 +3,8 @@ name = "cerebrium-demo"
 python_version = "3.12"
 docker_base_image_url = "debian:bookworm-slim"
 disable_auth = true
-include = ['./*', 'main.py', 'cerebrium.toml']
-exclude = ['.*']
+include = ['main.py', 'bot.py', 'cerebrium.toml']
+exclude = ['infrastructure/', 'Dockerfile', 'ecs-task-definition*.json', '*.sh', 'requirements.txt', '.gitignore', '.tool-versions']
 
 [cerebrium.hardware]
 cpu = 2.0

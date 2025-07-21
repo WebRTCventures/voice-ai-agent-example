@@ -1,6 +1,6 @@
 import json
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
 
@@ -18,9 +18,18 @@ app.add_middleware(
 
 
 @app.post("/")
-async def start_call():
+async def start_call(request: Request):
     print("POST TwiML")
-    return HTMLResponse(content=open("templates/streams.xml").read(), media_type="application/xml")
+    scheme = "wss" if request.url.scheme == "https" else "ws"
+    ws_url = f"{scheme}://{request.headers.get('host')}/ws"
+    xml_content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="{ws_url}"></Stream>
+  </Connect>
+  <Pause length="40"/>
+</Response>'''
+    return HTMLResponse(content=xml_content, media_type="application/xml")
 
 
 @app.websocket("/ws")
