@@ -50,6 +50,3 @@ aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-de
 
 echo "Deployment completed successfully!"
 echo "Your voice AI agent is now running on ECS."
-echo ""
-echo "Getting application access information..."
-./get-app-url.sh

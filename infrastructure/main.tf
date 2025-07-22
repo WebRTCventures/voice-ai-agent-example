@@ -201,8 +201,14 @@ resource "aws_ecs_task_definition" "placeholder" {
   
   container_definitions = jsonencode([
     {
-      name  = "placeholder"
+      name  = "voice-ai-agent"
       image = "nginx:alpine"
+      portMappings = [
+        {
+          containerPort = 8000
+          protocol      = "tcp"
+        }
+      ]
       essential = true
     }
   ])
