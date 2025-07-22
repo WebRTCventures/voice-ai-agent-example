@@ -1,8 +1,10 @@
 import json
+import os
 
 from fastapi import FastAPI, WebSocket, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import HTMLResponse
+from loguru import logger
 
 from bot import main
 
@@ -19,9 +21,17 @@ app.add_middleware(
 
 @app.post("/")
 async def start_call(request: Request):
-    print("POST TwiML")
-    scheme = "wss" if request.url.scheme == "https" else "ws"
-    ws_url = f"{scheme}://{request.headers.get('host')}/ws"
+    logger.info("Received POST request for TwiML")
+    
+    # Use environment variable if set, otherwise construct from request
+    ws_url = os.getenv("WEBSOCKET_URL")
+    if not ws_url:
+        forwarded_proto = request.headers.get("x-forwarded-proto")
+        is_https = forwarded_proto == "https" or request.url.scheme == "https"
+        scheme = "wss" if is_https else "ws"
+        host = request.headers.get('host')
+        ws_url = f"{scheme}://{host}/ws"
+    logger.info(f"Generated WebSocket URL: {ws_url}")
     xml_content = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Connect>
@@ -35,10 +45,10 @@ async def start_call(request: Request):
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    logger.info("WebSocket connection accepted")
     start_data = websocket.iter_text()
     await start_data.__anext__()
     call_data = json.loads(await start_data.__anext__())
-    print(call_data, flush=True)
     stream_sid = call_data["start"]["streamSid"]
-    print("WebSocket connection accepted")
+    logger.info(f"Starting voice AI session with stream_sid: {stream_sid}")
     await main(websocket, stream_sid)
