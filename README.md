@@ -90,10 +90,9 @@ A multilingual voice AI conversation partner built with FastAPI and Pipecat that
    ./deploy.sh
    ```
 
-4. **Get application URL**:
-   ```bash
-   ./get-app-url.sh
-   ```
+4. **Application URL**:
+   The application URL will be displayed at the end of the deployment process.
+   Use the ALB DNS name for accessing the application.
 
 ## API Endpoints
 

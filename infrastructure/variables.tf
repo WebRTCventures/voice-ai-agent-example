@@ -33,3 +33,14 @@ variable "twilio_auth_token" {
   type        = string
   sensitive   = true
 }
+
+variable "acm_certificate_arn" {
+  description = "ARN of an existing ACM certificate"
+  type        = string
+}
+
+variable "custom_domain" {
+  description = "Custom domain for the application (optional)"
+  type        = string
+  default     = ""
+}

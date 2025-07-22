@@ -5,6 +5,7 @@ This directory contains OpenTofu configuration to deploy the minimal AWS infrast
 ## Prerequisites
 - OpenTofu installed
 - AWS CLI configured with appropriate permissions
+- An existing ACM certificate for HTTPS/WSS support
 
 ## Quick Start
 
@@ -32,7 +33,8 @@ Task definitions are managed during deployment:
 ## What's Created
 - VPC with 2 public subnets
 - Internet Gateway and routing
-- Security group (allows port 8000)
+- Security groups for ALB and ECS
+- Application Load Balancer with HTTPS listener
 - ECS Fargate cluster
 - ECR repository
 - CloudWatch log group

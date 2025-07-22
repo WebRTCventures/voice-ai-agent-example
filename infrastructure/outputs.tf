@@ -42,3 +42,18 @@ output "aws_region" {
   description = "AWS Region"
   value       = var.aws_region
 }
+
+output "alb_dns_name" {
+  description = "Application Load Balancer DNS name"
+  value       = aws_lb.main.dns_name
+}
+
+output "application_url" {
+  description = "Application URL"
+  value       = var.custom_domain != "" ? "https://${var.custom_domain}" : "https://${aws_lb.main.dns_name}"
+}
+
+output "websocket_url" {
+  description = "WebSocket URL for the application"
+  value       = var.custom_domain != "" ? "wss://${var.custom_domain}/ws" : "wss://${aws_lb.main.dns_name}/ws"
+}

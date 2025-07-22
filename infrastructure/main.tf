@@ -69,7 +69,7 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-# Security Group
+# Security Group for ECS
 resource "aws_security_group" "ecs" {
   name_prefix = "voice-ai-ecs-"
   vpc_id      = aws_vpc.main.id
@@ -77,6 +77,33 @@ resource "aws_security_group" "ecs" {
   ingress {
     from_port   = 8000
     to_port     = 8000
+    protocol    = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+  
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Security Group for ALB
+resource "aws_security_group" "alb" {
+  name_prefix = "voice-ai-alb-"
+  vpc_id      = aws_vpc.main.id
+  
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -185,6 +212,72 @@ resource "aws_ecs_task_definition" "placeholder" {
   }
 }
 
+# Using existing ACM certificate
+
+# Application Load Balancer
+resource "aws_lb" "main" {
+  name               = "voice-ai-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = aws_subnet.public[*].id
+  
+  enable_deletion_protection = false
+}
+
+# ALB Target Group
+resource "aws_lb_target_group" "app" {
+  name        = "voice-ai-tg"
+  port        = 8000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+  
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    port                = "8000"
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    timeout             = 5
+    interval            = 30
+    matcher             = "200-499"
+  }
+}
+
+# ALB HTTPS Listener
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.acm_certificate_arn
+  
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
+# HTTP to HTTPS Redirect
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+  
+  default_action {
+    type = "redirect"
+    
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# DNS record for the ALB is managed outside this configuration
+
 # ECS Service
 resource "aws_ecs_service" "app" {
   name            = "voice-ai-service"
@@ -197,6 +290,12 @@ resource "aws_ecs_service" "app" {
     subnets          = aws_subnet.public[*].id
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
+  }
+  
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "voice-ai-agent"
+    container_port   = 8000
   }
   
   lifecycle {
